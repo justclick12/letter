@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07111f">
+<title>A Small Plot Twist</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap');
+:root{--bg:#07111f;--cream:#f8f0e5;--gold:#e7c78b;--muted:#b6bdca;--pink:#ff8ca5}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(ellipse at 50% 15%,#172b45 0%,var(--bg) 55%,#03070d 100%);color:var(--cream);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.8}
+main{position:relative;z-index:1;width:min(100% - 32px,680px);margin:auto}
+.screen{min-height:100svh;display:none;align-items:center;justify-content:center;text-align:center;padding:48px 4px;animation:fadeIn .8s ease both}
+.screen.active{display:flex}
+.inner{width:100%;max-width:560px}
+.eyebrow{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:24px}
+h1,h2{font-family:'Playfair Display',serif;font-weight:500;line-height:1.12;margin:0 0 20px}
+h1{font-size:clamp(3rem,12vw,5.6rem);letter-spacing:-.045em}
+h2{font-size:clamp(2.25rem,8vw,4rem)}
+p{color:var(--muted);font-size:1rem;line-height:1.8;margin:0 auto 24px;max-width:440px}
+.script{font-family:'Playfair Display',serif;font-style:italic;color:var(--gold)}
+button{font:inherit;cursor:pointer;border:1px solid #8e9aaa;border-radius:999px;padding:14px 22px;color:var(--cream);background:#101c2c;transition:transform .2s,background .2s,border-color .2s;min-height:48px}
+button:hover{transform:translateY(-2px);border-color:var(--gold)}
+button.primary{background:var(--cream);color:#101522;border-color:var(--cream);font-weight:600}
+button.primary:hover{background:var(--gold)}
+.buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:26px}
+.tiny{font-size:.78rem;margin-top:24px;color:#8f9aaa}
+.starmap{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:360px;margin:32px auto}
+.star{border:1px solid #3b4b60;background:#101b2c;border-radius:50%;width:70px;height:70px;justify-self:center;font-size:1.5rem;color:var(--gold);box-shadow:0 0 22px #d8b56a12}
+.star.done{background:#e7c78b;color:#08111d;box-shadow:0 0 28px #e7c78b55}
+.note{border:1px solid #77684e;background:linear-gradient(135deg,#f4e7d3,#e8d5b8);color:#1d2430;border-radius:5px;padding:26px 22px;max-width:420px;margin:24px auto;transform:rotate(-1deg);box-shadow:0 18px 55px #0005}
+.note p{color:#333b47}
+.note .script{color:#805b39}
+.choice{display:block;width:100%;max-width:360px;margin:10px auto;border-radius:14px;text-align:left}
+.choice span{color:var(--gold);margin-right:10px}
+.reveal{font-size:clamp(1.5rem,5vw,2.2rem);color:var(--cream);font-family:'Playfair Display',serif}
+.heart{font-size:2.4rem;color:var(--pink);animation:pulse 1.6s infinite}
+footer{position:relative;z-index:1;text-align:center;padding:0 20px 28px;color:#647184;font-size:.75rem}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{50%{transform:scale(1.15)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<main>
+<section class="screen active" id="s1">
+ <div class="inner">
+  <div class="eyebrow">A tiny mystery · No spoilers</div>
+  <h1>Zarina<br><span class="script">Yes, you.</span></h1>
+  <p>Men kichkinagina bir narsa yaratdim., va unda Siz bosh qahramonsiz.</p>
+  <button class="primary" onclick="go(2)">Boshlaymizmi? <span aria-hidden="true">✦</span></button>
+  <div class="tiny">Biroz qiziqish bilan o'qishni tafsiya beraman 🙃.</div>
+ </div>
+</section>
+<section class="screen" id="s2">
+ <div class="inner">
+  <div class="eyebrow">Chapter 01 · The investigation</div>
+  <h2>A very important<br><span class="script">investigation.</span></h2>
+  <p>Bu yerda uchta yulduzcha bor. Kerakli so‘zni ochish uchun ularning har biriga bosing.</p>
+  <div class="starmap">
+   <button class="star" aria-label="Open clue one" onclick="clue(0,this)">✦</button>
+   <button class="star" aria-label="Open clue two" onclick="clue(1,this)">✧</button>
+   <button class="star" aria-label="Open clue three" onclick="clue(2,this)">✦</button>
+  </div>
+  <p id="clueText" aria-live="polite">Your first clue is waiting above.</p>
+  <button class="primary" id="continue2" style="display:none" onclick="go(3)">I’m curious now →</button>
+ </div>
+</section>
+<section class="screen" id="s3">
+ <div class="inner">
+  <div class="eyebrow">Chapter 02 · Plot twist</div>
+  <h2>Okay, enough<br><span class="script">suspense.</span></h2>
+  <p>Actually, there’s no investigation. Men shunchaki bu qisqa lahzani biroz boshqacha qilishni xohlagandim.</p>
+  <p>Va Sizdan bir narsani so'ramoqchi edim</p>
+  <button class="primary" onclick="go(4)">Tell me →</button>
+ </div>
+</section>
+<section class="screen" id="s4">
+ <div class="inner">
+  <div class="eyebrow">A note, just for you</div>
+  <h2>Ba’zi narsalarni<br>oddiygina <span class="script">so‘rash yaxshiroq..</span></h2>
+  <div class="note">
+   <p class="script">No grand speech. Just an honest question.</p>
+   <p>Zarina Sizni yaxshiroq tanishni istardim. Balki birga chiroyli xotira yaratarmiz?</p>
+   <p style="margin-bottom:0">Can you give me a chance?</p>
+  </div>
+  <div class="buttons">
+   <button class="primary" onclick="go(5)">Roziman ♡</button>
+   <button onclick="go(6)">Bilmadim</button>
+  </div>
+  <div class="tiny">No pressure — an honest answer is always okay.</div>
+ </div>
+</section>
+<section class="screen" id="s5">
+ <div class="inner">
+  <div class="heart">♡</div>
+  <div class="eyebrow">A new little chapter</div>
+  <h2>That just made<br>me <span class="script">smile.</span></h2>
+  <p>Unda kelishib olamiz! Qaysi kun va qayerda uchrashishimizni birga tanlaymiz.</p>
+  <p class="reveal">Shunchaki oddiy uchrashuv va suhbat.</p>
+  <button class="primary" onclick="copyMessage()">Copy a message to send me ✦</button>
+  <p class="tiny" id="copyStatus" aria-live="polite">Tepadagini bosing va xabar nusxalanadi</p>
+  <button onclick="go(1)">Replay the little story ↺</button>
+ </div>
+</section>
+<section class="screen" id="s6">
+ <div class="inner">
+  <div class="eyebrow">No negative answer </div>
+  <h2>Rozi bo'lishdan <br><span class="script">boshqa tanlov yo'q baribir 😁.</span></h2>
+  <p>Shoshilishingiz shart emas. Agar xohlasangiz, avval oddiyroq suhbatlashishimiz ham mumkin.</p>
+  <div class="buttons">
+   <button class="primary" onclick="go(4)">Baribir rozi bo'lish</button>
+  </div>
+ </div>
+</section>
+</main>
+<footer>Made with a little courage and a lot of thought ✦</footer>
+<script>
+const screens=[...document.querySelectorAll('.screen')];
+function go(n){screens.forEach(s=>s.classList.remove('active'));document.getElementById('s'+n).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+const clues=[
+ 'Although I have not known You for a long time, stil You have a great place in my life.. ✨',
+ 'I just do not want to lose You. 🌙',
+ 'Although I have not known You for a long time, stil You have a great place in my life.. ♡'
+];
+let found=new Set();
+function clue(i,btn){if(found.has(i))return;found.add(i);btn.classList.add('done');document.getElementById('clueText').textContent=clues[i];if(found.size===3){document.getElementById('clueText').textContent='All clues found. Ready for the plot twist? ✨';document.getElementById('continue2').style.display='inline-block';}}
+async function copyMessage(){
+ const msg='Hey! I saw your little website, I’d like to talk about the invitation.';
+ const status=document.getElementById('copyStatus');
+ try{await navigator.clipboard.writeText(msg);status.textContent='Copied! Endi telegramdan yuboring.';}
+ catch(e){status.textContent='You can send this: “Hey! I saw your little website, I’d like to talk about the invitation.”';}
+}
+const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let stars=[];
+function resize(){canvas.width=innerWidth*devicePixelRatio;canvas.height=innerHeight*devicePixelRatio;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);stars=Array.from({length:Math.min(110,Math.floor(innerWidth/4))},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.4+.25,a:Math.random()*.65+.15,p:Math.random()*6.28}));}
+function draw(t){ctx.clearRect(0,0,innerWidth,innerHeight);for(const s of stars){ctx.globalAlpha=s.a*(.7+.3*Math.sin(t/900+s.p));ctx.fillStyle='#f5dfb0';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;requestAnimationFrame(draw);}
+addEventListener('resize',resize);resize();requestAnimationFrame(draw);
+</script>
+</body>
+</html>
